@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import BN from 'bignumber.js';
 import { connectMetamask, getBalanceETH, getBalanceWETH, getChainName, depositETH, withdrawETH } from './utils/common';
@@ -9,9 +9,7 @@ function App() {
   const [balanceETH, setBalanceETH] = useState();
   const [balanceWETH, setBalanceWETH] = useState();
   const [network, setNetwork] = useState();
-  const [, updateState] = useState();
-
-  const forceUpdate = useCallback(() => updateState({}), []);
+  const [needUpdate, setNeedUpdate] = useState(false);
 
   const depositAmountRef = useRef('');
   const withdrawAmountRef = useRef('');
@@ -44,7 +42,7 @@ function App() {
           console.log(error);
         });
     }
-  });
+  }, [address, needUpdate]);
 
   const deposit = async () => {
     const value = depositAmountRef.current.value;
@@ -53,7 +51,7 @@ function App() {
     try {
       await depositETH(address, new BN(value).toString());
       alert('Successfully Deposit');
-      forceUpdate();
+      setNeedUpdate(!needUpdate);
     } catch (error) {
       console.log(error);
     }
@@ -67,7 +65,7 @@ function App() {
     try {
       await withdrawETH(address, new BN(value).toString());
       alert('Successfully Withdraw');
-      forceUpdate();
+      setNeedUpdate(!needUpdate);
     } catch (error) {
       console.log(error);
     }
